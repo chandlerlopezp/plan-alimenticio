@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plan Nutricional — Santiago López</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Sora:wght@400;600;700&display=swap');
+
+  :root {
+    --bg: #F7F5F0;
+    --surface: #FFFFFF;
+    --surface2: #F0EDE7;
+    --border: #E2DDD6;
+    --text: #1A1714;
+    --text2: #6B6560;
+    --text3: #9C978F;
+    --accent: #2D6A4F;
+    --accent-light: #D8EFE4;
+    --accent2: #C25B2A;
+    --accent2-light: #FAE9DF;
+    --warn: #A0522D;
+    --blue: #1B4F8A;
+    --blue-light: #DDE8F5;
+    --gold: #7A5C1E;
+    --gold-light: #F5EDD4;
+    --font-display: 'Sora', sans-serif;
+    --font-body: 'Inter', sans-serif;
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--font-body);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* HEADER */
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .logo {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: -0.5px;
+  }
+  .logo span { color: var(--text); font-weight: 400; }
+  .header-actions { display: flex; gap: 10px; align-items: center; }
+  .btn-export {
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 8px 18px;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.15s;
+  }
+  .btn-export:hover { background: #235540; }
+  .btn-reset {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text2);
+    padding: 8px 14px;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-body);
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-reset:hover { border-color: var(--accent2); color: var(--accent2); }
+
+  /* HERO */
+  .hero {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 2rem 2rem 1.5rem;
+  }
+  .hero-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .hero h1 {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+  .hero-sub { font-size: 14px; color: var(--text2); }
+  .badge-objetivo {
+    background: var(--accent-light);
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+  .macros-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 10px;
+  }
+  .macro-card {
+    background: var(--surface2);
+    border-radius: var(--radius-sm);
+    padding: 12px 16px;
+    border-left: 3px solid transparent;
+  }
+  .macro-card.kcal { border-color: var(--accent2); }
+  .macro-card.prot { border-color: var(--blue); }
+  .macro-card.carb { border-color: var(--gold); }
+  .macro-card.fat  { border-color: var(--accent); }
+  .macro-val {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 2px;
+  }
+  .macro-card.kcal .macro-val { color: var(--accent2); }
+  .macro-card.prot .macro-val { color: var(--blue); }
+  .macro-card.carb .macro-val { color: var(--gold); }
+  .macro-card.fat  .macro-val { color: var(--accent); }
+  .macro-lbl { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text3); font-weight: 500; }
+
+  /* NOTAS */
+  .notas-section {
+    max-width: 1100px;
+    margin: 1.5rem auto 0;
+    padding: 0 2rem;
+  }
+  .notas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 10px;
+    margin-bottom: 1.5rem;
+  }
+  .nota-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    font-size: 13px;
+    color: var(--text2);
+    line-height: 1.5;
+  }
+  .nota-card strong { color: var(--text); font-weight: 600; display: block; margin-bottom: 4px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  /* DÍAS */
+  .main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 1.5rem 2rem 4rem;
+  }
+  .days-nav {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+  }
+  .day-btn {
+    padding: 8px 18px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text2);
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .day-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .day-btn.active {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+  }
+  .day-btn .day-tag {
+    font-size: 10px;
+    opacity: 0.75;
+    display: block;
+    text-align: center;
+    margin-top: 1px;
+  }
+
+  /* DAY CONTENT */
+  .day-view { display: none; }
+  .day-view.active { display: block; }
+
+  .meals-list { display: flex; flex-direction: column; gap: 12px; }
+
+  .meal-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    transition: box-shadow 0.15s;
+  }
+  .meal-card:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+
+  .meal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    gap: 10px;
+  }
+  .meal-header-left { display: flex; align-items: center; gap: 12px; }
+  .meal-icon {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+  .meal-title { font-weight: 600; font-size: 15px; color: var(--text); }
+  .meal-time { font-size: 12px; color: var(--text3); }
+  .meal-edit-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 5px 12px;
+    font-size: 12px;
+    color: var(--text2);
+    cursor: pointer;
+    font-family: var(--font-body);
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .meal-edit-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+
+  .meal-body { padding: 16px 18px; }
+
+  /* ITEMS */
+  .items-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+  .item-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    background: var(--surface2);
+    border-radius: var(--radius-sm);
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .item-name { font-size: 14px; color: var(--text); font-weight: 500; flex: 1; min-width: 140px; }
+  .item-portion {
+    font-size: 13px;
+    color: var(--accent);
+    font-weight: 600;
+    background: var(--accent-light);
+    padding: 2px 10px;
+    border-radius: 12px;
+    white-space: nowrap;
+  }
+  .item-macros { display: flex; gap: 8px; flex-wrap: wrap; }
+  .item-macro { font-size: 11px; color: var(--text3); }
+
+  /* MEAL MACROS TOTAL */
+  .meal-macros-bar {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+  }
+  .meal-macro-chip {
+    font-size: 12px;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-weight: 500;
+  }
+  .chip-kcal { background: var(--accent2-light); color: var(--accent2); }
+  .chip-prot { background: var(--blue-light); color: var(--blue); }
+  .chip-carb { background: var(--gold-light); color: var(--gold); }
+  .chip-fat  { background: var(--accent-light); color: var(--accent); }
+
+  /* TIP */
+  .meal-tip {
+    margin-top: 12px;
+    background: var(--accent-light);
+    border-left: 3px solid var(--accent);
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    font-size: 13px;
+    color: var(--accent);
+    line-height: 1.5;
+  }
+
+  /* MODAL */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--surface);
+    border-radius: var(--radius);
+    width: 100%;
+    max-width: 520px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+  }
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 20px;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    background: var(--surface);
+    z-index: 1;
+  }
+  .modal-title { font-family: var(--font-display); font-size: 17px; font-weight: 700; }
+  .modal-close {
+    background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text2);
+    width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
+    border-radius: 6px; transition: background 0.12s;
+  }
+  .modal-close:hover { background: var(--surface2); }
+  .modal-body { padding: 20px; }
+
+  .modal-items { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
+  .modal-item {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+  .modal-item-fields { flex: 1; display: flex; flex-direction: column; gap: 8px; min-width: 200px; }
+  .field-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .field-label { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.4px; width: 60px; flex-shrink: 0; }
+  .field-input {
+    flex: 1;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-family: var(--font-body);
+    font-size: 13px;
+    background: var(--surface);
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.12s;
+    min-width: 0;
+  }
+  .field-input:focus { border-color: var(--accent); }
+  .field-input.narrow { max-width: 80px; }
+  .field-select {
+    flex: 1;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-family: var(--font-body);
+    font-size: 13px;
+    background: var(--surface);
+    color: var(--text);
+    outline: none;
+  }
+  .btn-remove-item {
+    background: none; border: none; color: var(--text3); cursor: pointer;
+    font-size: 16px; padding: 4px; border-radius: 4px; transition: color 0.12s;
+    flex-shrink: 0;
+  }
+  .btn-remove-item:hover { color: var(--accent2); }
+
+  .btn-add-item {
+    display: flex; align-items: center; gap: 6px;
+    background: none; border: 1px dashed var(--border);
+    color: var(--text2); padding: 10px 16px;
+    border-radius: var(--radius-sm); cursor: pointer;
+    font-size: 13px; font-family: var(--font-body);
+    width: 100%; justify-content: center;
+    transition: all 0.15s;
+  }
+  .btn-add-item:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+
+  .modal-footer {
+    display: flex; gap: 10px; justify-content: flex-end;
+    padding: 16px 20px;
+    border-top: 1px solid var(--border);
+    position: sticky;
+    bottom: 0;
+    background: var(--surface);
+  }
+  .btn-save {
+    background: var(--accent); color: white; border: none;
+    padding: 10px 24px; border-radius: var(--radius-sm);
+    font-family: var(--font-body); font-size: 14px; font-weight: 600;
+    cursor: pointer; transition: background 0.15s;
+  }
+  .btn-save:hover { background: #235540; }
+  .btn-cancel {
+    background: transparent; border: 1px solid var(--border);
+    color: var(--text2); padding: 10px 18px;
+    border-radius: var(--radius-sm); font-family: var(--font-body);
+    font-size: 14px; cursor: pointer; transition: all 0.15s;
+  }
+  .btn-cancel:hover { border-color: var(--text2); }
+
+  /* PRINT */
+  @media print {
+    header { position: static; }
+    .days-nav { display: flex; flex-wrap: wrap; }
+    .day-view { display: block !important; page-break-before: always; }
+    .day-view:first-of-type { page-break-before: avoid; }
+    .meal-edit-btn, .btn-export, .btn-reset, .modal-overlay { display: none !important; }
+    body { background: white; }
+  }
+
+  @media (max-width: 600px) {
+    header { padding: 0 1rem; }
+    .hero { padding: 1.25rem 1rem 1rem; }
+    .hero h1 { font-size: 22px; }
+    .main { padding: 1rem 1rem 3rem; }
+    .notas-section { padding: 0 1rem; }
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    background: var(--text); color: white; padding: 10px 20px;
+    border-radius: 20px; font-size: 13px; font-weight: 500;
+    opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 9999;
+    white-space: nowrap;
+  }
+  .toast.show { opacity: 1; }
+
+  .edited-badge {
+    font-size: 10px; background: var(--accent2-light); color: var(--accent2);
+    padding: 2px 8px; border-radius: 10px; font-weight: 600; margin-left: 6px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">nutriplan <span>/ Santiago López</span></div>
+  <div class="header-actions">
+    <button class="btn-reset" onclick="resetAll()">↺ Restaurar original</button>
+    <button class="btn-export" onclick="window.print()">⬇ Exportar PDF</button>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="hero-top">
+    <div>
+      <h1>Plan alimentario semanal</h1>
+      <div class="hero-sub">98 kg · 1.70 m · 5 entrenamientos/semana · Objetivo: pérdida de grasa</div>
+    </div>
+    <div class="badge-objetivo">↓ Déficit ~400 kcal/día</div>
+  </div>
+  <div class="macros-row">
+    <div class="macro-card kcal"><div class="macro-val">2.450</div><div class="macro-lbl">Kcal / día</div></div>
+    <div class="macro-card prot"><div class="macro-val">195g</div><div class="macro-lbl">Proteína</div></div>
+    <div class="macro-card carb"><div class="macro-val">230g</div><div class="macro-lbl">Carbohidratos</div></div>
+    <div class="macro-card fat"><div class="macro-val">75g</div><div class="macro-lbl">Grasas</div></div>
+  </div>
+</div>
+
+<div class="notas-section">
+  <div style="height:1.25rem"></div>
+  <div class="notas-grid">
+    <div class="nota-card"><strong>Proteína — fuentes principales</strong>Pechugas y huevos son la base. Rotá con atún al natural, costeletas magras y claras de huevo.</div>
+    <div class="nota-card"><strong>Carbohidratos — timing</strong>Más carbos en días de gimnasio (lunes–viernes), concentrados en almuerzo y post-entreno. Menos el domingo.</div>
+    <div class="nota-card"><strong>Cantidades de referencia</strong>Pechuga pesada cruda (resta ~25% al cocinar). Arroz y fideos: gramos en cocido. Aceite: 1 cdita por comida.</div>
+    <div class="nota-card"><strong>Chocolate amargo y frutos secos</strong>Colación ideal para el antojo dulce. Chocolate 70%+, frutos secos crudos sin sal. Respetá las cantidades.</div>
+    <div class="nota-card"><strong>Café</strong>Sin azúcar o con edulcorante. Con leche descremada está bien. No suma calorías significativas.</div>
+    <div class="nota-card"><strong>Cómo usar este plan</strong>Hacé clic en "Editar" en cualquier comida para cambiar un alimento o la porción. Los cambios se guardan automáticamente.</div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="days-nav" id="daysNav"></div>
+  <div id="daysContainer"></div>
+</div>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle">Editar comida</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-items" id="modalItems"></div>
+      <button class="btn-add-item" onclick="addModalItem()">+ Agregar alimento</button>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+      <button class="btn-save" onclick="saveModal()">Guardar cambios</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── DEFAULT DATA ──────────────────────────────────────────────────────────────
+const DEFAULT_DAYS = [
+  {
+    label: "Lunes", tag: "Gimnasio",
+    meals: [
+      { name: "Desayuno", time: "7:00", icon: "☀️", color: "#FFF3E0",
+        items: [
+          { name: "Claras de huevo", portion: "3 unidades", kcal: 51, prot: 10, carb: 0, fat: 0 },
+          { name: "Huevo entero", portion: "1 unidad", kcal: 72, prot: 6, carb: 0, fat: 5 },
+          { name: "Tostadas integrales", portion: "2 unidades (~50g)", kcal: 130, prot: 5, carb: 24, fat: 2 },
+          { name: "Leche descremada (café con leche)", portion: "200ml", kcal: 68, prot: 7, carb: 10, fat: 0 }
+        ],
+        tip: "Día de gimnasio: priorizá los carbos en el almuerzo y post-entreno para rendir bien y recuperar." },
+      { name: "Almuerzo", time: "12:30", icon: "🍽️", color: "#E3F2FD",
+        items: [
+          { name: "Pechuga de pollo (cruda)", portion: "250g (~190g cocida)", kcal: 290, prot: 54, carb: 0, fat: 6 },
+          { name: "Arroz blanco cocido", portion: "120g", kcal: 156, prot: 3, carb: 34, fat: 0 },
+          { name: "Lechuga", portion: "60g", kcal: 8, prot: 0, carb: 1, fat: 0 },
+          { name: "Tomate", portion: "100g", kcal: 18, prot: 0, carb: 4, fat: 0 },
+          { name: "Zanahoria rallada", portion: "80g", kcal: 33, prot: 0, carb: 7, fat: 0 },
+          { name: "Aceite de oliva", portion: "1 cdita (5ml)", kcal: 45, prot: 0, carb: 0, fat: 5 }
+        ], tip: "" },
+      { name: "Merienda pre-entreno", time: "17:00", icon: "⚡", color: "#E8F5E9",
+        items: [
+          { name: "Banana", portion: "1 mediana (~120g)", kcal: 107, prot: 1, carb: 27, fat: 0 },
+          { name: "Frutos secos (almendras)", portion: "30g", kcal: 174, prot: 6, carb: 5, fat: 15 },
+          { name: "Café solo", portion: "1 taza", kcal: 5, prot: 0, carb: 0, fat: 0 }
+        ], tip: "" },
+      { name: "Cena / Post-entreno", time: "20:30", icon: "🌙", color: "#EDE7F6",
+        items: [
+          { name: "Pechuga de pollo (cruda)", portion: "220g (~165g cocida)", kcal: 255, prot: 48, carb: 0, fat: 5 },
+          { name: "Batata hervida", portion: "200g", kcal: 172, prot: 2, carb: 40, fat: 0 },
+          { name: "Zapallito al vapor", portion: "150g", kcal: 25, prot: 1, carb: 4, fat: 0 }
+        ], tip: "" },
+      { name: "Colación nocturna", time: "22:00", icon: "🌜", color: "#F5F5F5",
+        items: [
+          { name: "Huevos duros", portion: "2 unidades", kcal: 144, prot: 12, carb: 0, fat: 10 },
+          { name: "Chocolate amargo 70%+", portion: "2 cuadraditos (~10g)", kcal: 55, prot: 1, carb: 5, fat: 4 }
+        ], tip: "" }
+    ]
+  },
+  {
+    label: "Martes", tag: "Gimnasio",
+    meals: [
+      { name: "Desayuno", time: "7:00", icon: "☀️", color: "#FFF3E0",
+        items: [
+          { name: "Claras de huevo", portion: "4 unidades", kcal: 68, prot: 14, carb: 0, fat: 0 },
+          { name: "Yema de huevo", portion: "1 unidad", kcal: 55, prot: 3, carb: 0, fat: 5 },
+          { name: "Tomate", portion: "100g", kcal: 18, prot: 0, carb: 4, fat: 0 },
+          { name: "Tostada integral", portion: "2 unidades", kcal: 130, prot: 5, carb: 24, fat: 2 },
+          { name: "Café con leche descremada", portion: "200ml leche", kcal: 68, prot: 7, carb: 10, fat: 0 }
+        ], tip: "Podés agregar especias (pimentón, orégano, ajo en polvo) a las pechugas para dar más sabor sin sumar calorías." },
+      { name: "Almuerzo", time: "12:30", icon: "🍽️", color: "#E3F2FD",
+        items: [
+          { name: "Atún al natural", portion: "180g (1 lata grande)", kcal: 198, prot: 44, carb: 0, fat: 2 },
+          { name: "Fideos integrales cocidos", portion: "130g", kcal: 176, prot: 6, carb: 34, fat: 1 },
+          { name: "Salsa de tomate casera", portion: "100g", kcal: 40, prot: 1, carb: 8, fat: 0 },
+          { name: "Lechuga", portion: "60g", kcal: 8, prot: 0, carb: 1, fat: 0 }
+        ], tip: "" },
+      { name: "Merienda pre-entreno", time: "17:00", icon: "⚡", color: "#E8F5E9",
+        items: [
+          { name: "Manzana", portion: "1 mediana (~150g)", kcal: 78, prot: 0, carb: 21, fat: 0 },
+          { name: "Tostadas con queso untable descremado", portion: "2 tostadas + 30g queso", kcal: 170, prot: 9, carb: 22, fat: 4 },
+          { name: "Café", portion: "1 taza", kcal: 5, prot: 0, carb: 0, fat: 0 }
+        ], tip: "" },
+      { name: "Cena / Post-entreno", time: "20:30", icon: "🌙", color: "#EDE7F6",
+        items: [
+          { name: "Pechuga de pollo (cruda)", portion: "250g (~190g cocida)", kcal: 290, prot: 54, carb: 0, fat: 6 },
+          { name: "Papa hervida", portion: "150g", kcal: 116, prot: 2, carb: 26, fat: 0 },
+          { name: "Repollo rehogado con ajo", portion: "150g", kcal: 45, prot: 2, carb: 8, fat: 1 }
+        ], tip: "" },
+      { name: "Colación nocturna", time: "22:00", icon: "🌜", color: "#F5F5F5",
+        items: [
+          { name: "Leche descremada", portion: "250ml", kcal: 85, prot: 9, carb: 12, fat: 0 },
+          { name: "Chocolate amargo 70%+", portion: "2 cuadraditos (~10g)", kcal: 55, prot: 1, carb: 5, fat: 4 }
+        ], tip: "" }
+    ]
+  },
+  {
+    label: "Miércoles", tag: "Gimnasio",
+    meals: [
+      { name: "Desayuno", time: "7:00", icon: "☀️", color: "#FFF3E0",
+        items: [
+          { name: "Huevos enteros", portion: "2 unidades", kcal: 144, prot: 12, carb: 0, fat: 10 },
+          { name: "Claras de huevo", portion: "2 unidades", kcal: 34, prot: 7, carb: 0, fat: 0 },
+          { name: "Palta", portion: "¼ palta (~50g)", kcal: 80, prot: 1, carb: 3, fat: 8 },
+          { name: "Tostadas integrales", portion: "2 unidades", kcal: 130, prot: 5, carb: 24, fat: 2 },
+          { name: "Café con leche descremada", portion: "200ml leche", kcal: 68, prot: 7, carb: 10, fat: 0 }
+        ], tip: "" },
+      { name: "Almuerzo", time: "12:30", icon: "🍽️", color: "#E3F2FD",
+        items: [
+          { name: "Costeletas de cerdo magras", portion: "200g (crudas)", kcal: 280, prot: 40, carb: 0, fat: 12 },
+          { name: "Arroz yamaní cocido", portion: "120g", kcal: 155, prot: 4, carb: 33, fat: 1 },
+          { name: "Repollo crudo", portion: "100g", kcal: 25, prot: 1, carb: 5, fat: 0 },
+          { name: "Zanahoria rallada", portion: "80g", kcal: 33, prot: 0, carb: 7, fat: 0 }
+        ], tip: "El día de miércoles tenés un buen balance: carbo al mediodía, proteína limpia a la noche." },
+      { name: "Merienda pre-entreno", time: "17:00", icon: "⚡", color: "#E8F5E9",
+        items: [
+          { name: "Banana", portion: "1 mediana (~120g)", kcal: 107, prot: 1, carb: 27, fat: 0 },
+          { name: "Huevo duro", portion: "1 unidad", kcal: 72, prot: 6, carb: 0, fat: 5 },
+          { name: "Café", portion: "1 taza", kcal: 5, prot: 0, carb: 0, fat: 0 }
+        ], tip: "" },
+      { name: "Cena / Post-entreno", time: "20:30", icon: "🌙", color: "#EDE7F6",
+        items: [
+          { name: "Atún al natural", portion: "180g", kcal: 198, prot: 44, carb: 0, fat: 2 },
+          { name: "Lechuga", portion: "80g", kcal: 10, prot: 0, carb: 2, fat: 0 },
+          { name: "Tomate", portion: "100g", kcal: 18, prot: 0, carb: 4, fat: 0 },
+          { name: "Zanahoria", portion: "80g", kcal: 33, prot: 0, carb: 7, fat: 0 },
+          { name: "Zapallito crudo", portion: "100g", kcal: 17, prot: 1, carb: 3, fat: 0 },
+          { name: "Papa hervida", portion: "150g", kcal: 116, prot: 2, carb: 26, fat: 0 }
+        ], tip: "" },
+      { name: "Colación nocturna", time: "22:00", icon: "🌜", color: "#F5F5F5",
+        items: [
+          { name: "Claras de huevo cocidas", portion: "3 unidades", kcal: 51, prot: 10, carb: 0, fat: 0 },
+          { name: "Frutos secos (nueces)", portion: "30g", kcal: 196, prot: 5, carb: 4, fat: 19 }
+        ], tip: "" }
+    ]
+  },
+  {
+    label: "Jueves", tag: "Gimnasio",
+    meals: [
+      { name: "Desayuno", time: "7:00", icon: "☀️", color: "#FFF3E0",
+        items: [
+          { name: "Claras de huevo", portion: "3 unidades", kcal: 51, prot: 10, carb: 0, fat: 0 },
+          { name: "Huevo entero", portion: "1 unidad", kcal: 72, prot: 6, carb: 0, fat: 5 },
+          { name: "Tostadas integrales", portion: "2 unidades", kcal: 130, prot: 5, carb: 24, fat: 2 },
+          { name: "Café con leche descremada", portion: "200ml leche", kcal: 68, prot: 7, carb: 10, fat: 0 }
+        ], tip: "" },
+      { name: "Almuerzo", time: "12:30", icon: "🍽️", color: "#E3F2FD",
+        items: [
+          { name: "Pechuga de pollo en tiras (cruda)", portion: "250g", kcal: 290, prot: 54, carb: 0, fat: 6 },
+          { name: "Zapallito salteado", portion: "150g", kcal: 25, prot: 1, carb: 4, fat: 0 },
+          { name: "Repollo", portion: "100g", kcal: 25, prot: 1, carb: 5, fat: 0 },
+          { name: "Zanahoria", portion: "80g", kcal: 33, prot: 0, carb: 7, fat: 0 },
+          { name: "Arroz blanco cocido", portion: "100g", kcal: 130, prot: 2, carb: 28, fat: 0 }
+        ], tip: "" },
+      { name: "Merienda pre-entreno", time: "17:00", icon: "⚡", color: "#E8F5E9",
+        items: [
+          { name: "Manzana", portion: "1 mediana (~150g)", kcal: 78, prot: 0, carb: 21, fat: 0 },
+          { name: "Tostadas con queso", portion: "2 tostadas + 20g queso", kcal: 180, prot: 10, carb: 22, fat: 6 },
+          { name: "Café", portion: "1 taza", kcal: 5, prot: 0, carb: 0, fat: 0 }
+        ], tip: "" },
+      { name: "Cena / Post-entreno", time: "20:30", icon: "🌙", color: "#EDE7F6",
+        items: [
+          { name: "Pechuga al horno con limón y orégano (cruda)", portion: "250g", kcal: 290, prot: 54, carb: 0, fat: 6 },
+          { name: "Puré de zapallo (sin manteca)", portion: "250g zapallo", kcal: 50, prot: 2, carb: 12, fat: 0 },
+          { name: "Ensalada lechuga y tomate", portion: "100g c/u", kcal: 25, prot: 0, carb: 5, fat: 0 }
+        ], tip: "El puré de zapallo es bajo en calorías y muy saciante — ideal para la cena post-entreno." },
+      { name: "Colación nocturna", time: "22:00", icon: "🌜", color: "#F5F5F5",
+        items: [
+          { name: "Leche descremada", portion: "250ml", kcal: 85, prot: 9, carb: 12, fat: 0 },
+          { name: "Chocolate amargo 70%+", portion: "2 cuadraditos (~10g)", kcal: 55, prot: 1, carb: 5, fat: 4 }
+        ], tip: "" }
+    ]
+  },
+  {
+    label: "Viernes", tag: "Cardio",
+    meals: [
+      { name: "Desayuno", time: "7:00", icon: "☀️", color: "#FFF3E0",
+        items: [
+          { name: "Huevos enteros", portion: "2 unidades", kcal: 144, prot: 12, carb: 0, fat: 10 },
+          { name: "Clara de huevo", portion: "1 unidad", kcal: 17, prot: 3, carb: 0, fat: 0 },
+          { name: "Palta", portion: "¼ palta (~50g)", kcal: 80, prot: 1, carb: 3, fat: 8 },
+          { name: "Tostada integral", portion: "1 unidad", kcal: 65, prot: 2, carb: 12, fat: 1 },
+          { name: "Café con leche descremada", portion: "200ml leche", kcal: 68, prot: 7, carb: 10, fat: 0 }
+        ], tip: "Día de cardio: podés hacerlo en ayunas o con el desayuno liviano, según cómo te sientas." },
+      { name: "Almuerzo", time: "12:30", icon: "🍽️", color: "#E3F2FD",
+        items: [
+          { name: "Atún al natural", portion: "200g", kcal: 220, prot: 48, carb: 0, fat: 2 },
+          { name: "Lechuga", portion: "80g", kcal: 10, prot: 0, carb: 2, fat: 0 },
+          { name: "Tomate", portion: "100g", kcal: 18, prot: 0, carb: 4, fat: 0 },
+          { name: "Repollo morado", portion: "80g", kcal: 22, prot: 1, carb: 4, fat: 0 },
+          { name: "Zanahoria", portion: "80g", kcal: 33, prot: 0, carb: 7, fat: 0 },
+          { name: "Palta", portion: "¼ palta (~50g)", kcal: 80, prot: 1, carb: 3, fat: 8 },
+          { name: "Pan integral", portion: "1 rebanada", kcal: 70, prot: 3, carb: 13, fat: 1 }
+        ], tip: "" },
+      { name: "Merienda", time: "16:30", icon: "🍎", color: "#E8F5E9",
+        items: [
+          { name: "Banana", portion: "1 mediana (~120g)", kcal: 107, prot: 1, carb: 27, fat: 0 },
+          { name: "Huevo duro", portion: "1 unidad", kcal: 72, prot: 6, carb: 0, fat: 5 },
+          { name: "Café", portion: "1 taza", kcal: 5, prot: 0, carb: 0, fat: 0 }
+        ], tip: "" },
+      { name: "Cena / Post-cardio", time: "19:30", icon: "🌙", color: "#EDE7F6",
+        items: [
+          { name: "Pechuga a la plancha (cruda)", portion: "220g", kcal: 255, prot: 48, carb: 0, fat: 5 },
+          { name: "Batata al horno con pimentón", portion: "180g", kcal: 155, prot: 2, carb: 36, fat: 0 },
+          { name: "Zanahoria rallada y lechuga", portion: "150g total", kcal: 35, prot: 0, carb: 7, fat: 0 }
+        ], tip: "" },
+      { name: "Colación nocturna", time: "21:30", icon: "🌜", color: "#F5F5F5",
+        items: [
+          { name: "Claras de huevo cocidas", portion: "3 unidades", kcal: 51, prot: 10, carb: 0, fat: 0 },
+          { name: "Chocolate amargo 70%+", portion: "2 cuadraditos (~10g)", kcal: 55, prot: 1, carb: 5, fat: 4 }
+        ], tip: "" }
+    ]
+  },
+  {
+    label: "Sábado", tag: "Libre",
+    meals: [
+      { name: "Desayuno", time: "8:30", icon: "☀️", color: "#FFF3E0",
+        items: [
+          { name: "Huevos enteros", portion: "3 unidades", kcal: 216, prot: 18, carb: 0, fat: 15 },
+          { name: "Tomate", portion: "100g", kcal: 18, prot: 0, carb: 4, fat: 0 },
+          { name: "Repollo", portion: "80g", kcal: 20, prot: 1, carb: 4, fat: 0 },
+          { name: "Queso (tipo Port Salut)", portion: "30g", kcal: 90, prot: 7, carb: 0, fat: 7 },
+          { name: "Tostadas integrales", portion: "2 unidades", kcal: 130, prot: 5, carb: 24, fat: 2 },
+          { name: "Café con leche", portion: "200ml leche", kcal: 68, prot: 7, carb: 10, fat: 0 }
+        ], tip: "Sábado más relajado pero igual ordenado. Si salís a comer, priorizá proteína + ensalada como base." },
+      { name: "Almuerzo", time: "13:00", icon: "🍽️", color: "#E3F2FD",
+        items: [
+          { name: "Costeletas a la plancha/parrilla", portion: "220g (crudas)", kcal: 308, prot: 44, carb: 0, fat: 13 },
+          { name: "Papa hervida", portion: "200g", kcal: 154, prot: 4, carb: 35, fat: 0 },
+          { name: "Ensalada lechuga, tomate y repollo", portion: "200g total", kcal: 35, prot: 1, carb: 6, fat: 0 }
+        ], tip: "" },
+      { name: "Colación", time: "17:00", icon: "🍎", color: "#E8F5E9",
+        items: [
+          { name: "Manzana", portion: "1 mediana (~150g)", kcal: 78, prot: 0, carb: 21, fat: 0 },
+          { name: "Frutos secos", portion: "30g", kcal: 185, prot: 5, carb: 5, fat: 16 },
+          { name: "Café", portion: "1 taza", kcal: 5, prot: 0, carb: 0, fat: 0 }
+        ], tip: "" },
+      { name: "Cena", time: "21:00", icon: "🌙", color: "#EDE7F6",
+        items: [
+          { name: "Pechuga al horno (cruda)", portion: "220g", kcal: 255, prot: 48, carb: 0, fat: 5 },
+          { name: "Fideos cocidos", portion: "120g", kcal: 155, prot: 5, carb: 31, fat: 1 },
+          { name: "Salsa de tomate con ajo", portion: "100g", kcal: 40, prot: 1, carb: 8, fat: 0 },
+          { name: "Ensalada verde", portion: "80g", kcal: 10, prot: 0, carb: 2, fat: 0 }
+        ], tip: "" }
+    ]
+  },
+  {
+    label: "Domingo", tag: "Descanso",
+    meals: [
+      { name: "Desayuno", time: "9:00", icon: "☀️", color: "#FFF3E0",
+        items: [
+          { name: "Huevos enteros revueltos", portion: "3 unidades", kcal: 216, prot: 18, carb: 0, fat: 15 },
+          { name: "Tomate", portion: "100g", kcal: 18, prot: 0, carb: 4, fat: 0 },
+          { name: "Palta", portion: "½ palta (~100g)", kcal: 160, prot: 2, carb: 6, fat: 15 },
+          { name: "Tostadas integrales", portion: "2 unidades", kcal: 130, prot: 5, carb: 24, fat: 2 },
+          { name: "Café con leche", portion: "200ml leche", kcal: 68, prot: 7, carb: 10, fat: 0 }
+        ], tip: "Domingo de descanso: un poco menos de carbos pero proteína alta para la recuperación." },
+      { name: "Almuerzo", time: "13:30", icon: "🍽️", color: "#E3F2FD",
+        items: [
+          { name: "Pechuga al horno con limón (cruda)", portion: "250g", kcal: 290, prot: 54, carb: 0, fat: 6 },
+          { name: "Arroz blanco cocido", portion: "100g", kcal: 130, prot: 2, carb: 28, fat: 0 },
+          { name: "Puré de zapallo", portion: "200g zapallo", kcal: 40, prot: 1, carb: 10, fat: 0 },
+          { name: "Ensalada repollo y zanahoria", portion: "150g total", kcal: 40, prot: 1, carb: 8, fat: 0 }
+        ], tip: "" },
+      { name: "Colación", time: "17:00", icon: "🍎", color: "#E8F5E9",
+        items: [
+          { name: "Banana", portion: "1 mediana (~120g)", kcal: 107, prot: 1, carb: 27, fat: 0 },
+          { name: "Leche descremada", portion: "200ml", kcal: 68, prot: 7, carb: 10, fat: 0 },
+          { name: "Chocolate amargo 70%+", portion: "2 cuadraditos (~10g)", kcal: 55, prot: 1, carb: 5, fat: 4 }
+        ], tip: "" },
+      { name: "Cena", time: "20:30", icon: "🌙", color: "#EDE7F6",
+        items: [
+          { name: "Atún al natural", portion: "160g", kcal: 176, prot: 39, carb: 0, fat: 2 },
+          { name: "Lechuga", portion: "80g", kcal: 10, prot: 0, carb: 2, fat: 0 },
+          { name: "Tomate", portion: "100g", kcal: 18, prot: 0, carb: 4, fat: 0 },
+          { name: "Zanahoria", portion: "80g", kcal: 33, prot: 0, carb: 7, fat: 0 },
+          { name: "Zapallito", portion: "100g", kcal: 17, prot: 1, carb: 3, fat: 0 },
+          { name: "Papa mediana hervida", portion: "130g", kcal: 100, prot: 2, carb: 23, fat: 0 },
+          { name: "Huevo duro", portion: "1 unidad", kcal: 72, prot: 6, carb: 0, fat: 5 }
+        ], tip: "" }
+    ]
+  }
+];
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+const STORAGE_KEY = 'nutriplan_santiago_v1';
+let planData = [];
+let activeDay = 0;
+let editingDayIdx = null;
+let editingMealIdx = null;
+
+function loadData() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      planData = JSON.parse(saved);
+    } else {
+      planData = JSON.parse(JSON.stringify(DEFAULT_DAYS));
+    }
+  } catch(e) {
+    planData = JSON.parse(JSON.stringify(DEFAULT_DAYS));
+  }
+}
+
+function saveData() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(planData));
+  } catch(e) {}
+}
+
+function isEdited(dayIdx, mealIdx) {
+  const def = DEFAULT_DAYS[dayIdx].meals[mealIdx];
+  const cur = planData[dayIdx].meals[mealIdx];
+  return JSON.stringify(def.items) !== JSON.stringify(cur.items);
+}
+
+// ── RENDER ────────────────────────────────────────────────────────────────────
+function calcMealMacros(items) {
+  return items.reduce((acc, it) => ({
+    kcal: acc.kcal + (it.kcal||0),
+    prot: acc.prot + (it.prot||0),
+    carb: acc.carb + (it.carb||0),
+    fat:  acc.fat  + (it.fat||0)
+  }), { kcal:0, prot:0, carb:0, fat:0 });
+}
+
+function renderNav() {
+  const nav = document.getElementById('daysNav');
+  nav.innerHTML = planData.map((d, i) => `
+    <button class="day-btn ${i===activeDay?'active':''}" onclick="switchDay(${i})">
+      ${d.label}
+      <span class="day-tag">${d.tag}</span>
+    </button>
+  `).join('');
+}
+
+function renderDays() {
+  const container = document.getElementById('daysContainer');
+  container.innerHTML = planData.map((day, di) => `
+    <div class="day-view ${di===activeDay?'active':''}" id="day-view-${di}">
+      <div class="meals-list">
+        ${day.meals.map((meal, mi) => {
+          const m = calcMealMacros(meal.items);
+          const edited = isEdited(di, mi);
+          return `
+          <div class="meal-card">
+            <div class="meal-header">
+              <div class="meal-header-left">
+                <div class="meal-icon" style="background:${meal.color}">${meal.icon}</div>
+                <div>
+                  <div class="meal-title">${meal.name}${edited?'<span class="edited-badge">editado</span>':''}</div>
+                  <div class="meal-time">${meal.time}</div>
+                </div>
+              </div>
+              <button class="meal-edit-btn" onclick="openModal(${di},${mi})">✏ Editar</button>
+            </div>
+            <div class="meal-body">
+              <div class="items-list">
+                ${meal.items.map(it => `
+                  <div class="item-row">
+                    <div class="item-name">${it.name}</div>
+                    <div class="item-portion">${it.portion}</div>
+                    <div class="item-macros">
+                      <span class="item-macro">🔥 ${it.kcal} kcal</span>
+                      <span class="item-macro">💪 ${it.prot}g prot</span>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+              <div class="meal-macros-bar">
+                <span class="meal-macro-chip chip-kcal">🔥 ${m.kcal} kcal</span>
+                <span class="meal-macro-chip chip-prot">💪 ${m.prot}g prot</span>
+                <span class="meal-macro-chip chip-carb">🌾 ${m.carb}g carb</span>
+                <span class="meal-macro-chip chip-fat">🥑 ${m.fat}g grasas</span>
+              </div>
+              ${meal.tip ? `<div class="meal-tip">💡 ${meal.tip}</div>` : ''}
+            </div>
+          </div>
+        `}).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+function render() {
+  renderNav();
+  renderDays();
+}
+
+function switchDay(idx) {
+  activeDay = idx;
+  render();
+}
+
+// ── MODAL ────────────────────────────────────────────────────────────────────
+function openModal(dayIdx, mealIdx) {
+  editingDayIdx = dayIdx;
+  editingMealIdx = mealIdx;
+  const meal = planData[dayIdx].meals[mealIdx];
+  document.getElementById('modalTitle').textContent = `${planData[dayIdx].label} — ${meal.name}`;
+  renderModalItems(meal.items);
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+function renderModalItems(items) {
+  const container = document.getElementById('modalItems');
+  container.innerHTML = items.map((it, i) => `
+    <div class="modal-item" id="modal-item-${i}">
+      <div class="modal-item-fields">
+        <div class="field-row">
+          <span class="field-label">Alimento</span>
+          <input class="field-input" type="text" value="${it.name}" placeholder="Nombre del alimento" id="item-name-${i}">
+        </div>
+        <div class="field-row">
+          <span class="field-label">Porción</span>
+          <input class="field-input" type="text" value="${it.portion}" placeholder="ej: 200g, 1 unidad" id="item-portion-${i}">
+        </div>
+        <div class="field-row">
+          <span class="field-label">Kcal</span>
+          <input class="field-input narrow" type="number" value="${it.kcal}" id="item-kcal-${i}" min="0">
+          <span class="field-label" style="width:auto; margin-left:8px">Prot</span>
+          <input class="field-input narrow" type="number" value="${it.prot}" id="item-prot-${i}" min="0">
+          <span class="field-label" style="width:auto; margin-left:8px">Carb</span>
+          <input class="field-input narrow" type="number" value="${it.carb}" id="item-carb-${i}" min="0">
+          <span class="field-label" style="width:auto; margin-left:8px">Grasas</span>
+          <input class="field-input narrow" type="number" value="${it.fat}" id="item-fat-${i}" min="0">
+        </div>
+      </div>
+      <button class="btn-remove-item" onclick="removeModalItem(${i})" title="Quitar alimento">✕</button>
+    </div>
+  `).join('');
+}
+
+function addModalItem() {
+  const meal = planData[editingDayIdx].meals[editingMealIdx];
+  const currentItems = readModalItems();
+  currentItems.push({ name: '', portion: '', kcal: 0, prot: 0, carb: 0, fat: 0 });
+  renderModalItems(currentItems);
+  const container = document.getElementById('modalItems');
+  const last = container.lastElementChild;
+  if (last) last.querySelector('input').focus();
+}
+
+function removeModalItem(idx) {
+  const items = readModalItems();
+  if (items.length <= 1) { showToast('Debe haber al menos un alimento'); return; }
+  items.splice(idx, 1);
+  renderModalItems(items);
+}
+
+function readModalItems() {
+  const items = [];
+  const container = document.getElementById('modalItems');
+  const rows = container.querySelectorAll('.modal-item');
+  rows.forEach((_, i) => {
+    items.push({
+      name:    document.getElementById(`item-name-${i}`)?.value || '',
+      portion: document.getElementById(`item-portion-${i}`)?.value || '',
+      kcal:    parseInt(document.getElementById(`item-kcal-${i}`)?.value) || 0,
+      prot:    parseInt(document.getElementById(`item-prot-${i}`)?.value) || 0,
+      carb:    parseInt(document.getElementById(`item-carb-${i}`)?.value) || 0,
+      fat:     parseInt(document.getElementById(`item-fat-${i}`)?.value) || 0
+    });
+  });
+  return items;
+}
+
+function saveModal() {
+  const items = readModalItems();
+  if (items.some(it => !it.name.trim())) {
+    showToast('Completá el nombre de todos los alimentos');
+    return;
+  }
+  planData[editingDayIdx].meals[editingMealIdx].items = items;
+  saveData();
+  closeModal();
+  render();
+  showToast('✓ Cambios guardados');
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+  editingDayIdx = null;
+  editingMealIdx = null;
+}
+
+document.getElementById('modalOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+// ── RESET ────────────────────────────────────────────────────────────────────
+function resetAll() {
+  if (confirm('¿Restaurar el plan original? Se perderán todos tus cambios.')) {
+    planData = JSON.parse(JSON.stringify(DEFAULT_DAYS));
+    saveData();
+    render();
+    showToast('Plan restaurado al original');
+  }
+}
+
+// ── TOAST ────────────────────────────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ── INIT ─────────────────────────────────────────────────────────────────────
+loadData();
+render();
+</script>
+</body>
+</html>
