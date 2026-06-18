@@ -399,17 +399,31 @@ const MENU_LIBRARY = {
     { id:'m6', name:'Claras de huevo + frutos secos', desc:'Pre o post entreno liviano',
       items:[{name:'Claras de huevo cocidas',portion:'3 uds',kcal:51,prot:10,carb:0,fat:0},{name:'Frutos secos (nueces)',portion:'30g',kcal:196,prot:5,carb:4,fat:19}]},
   ],
-  colacion: [
-    { id:'co1', name:'Huevos duros + chocolate amargo', desc:'',
+  mediamañana: [
+    { id:'mm1', name:'Huevos duros + chocolate amargo', desc:'Proteína + antojo cubierto',
       items:[{name:'Huevos duros',portion:'2 uds',kcal:144,prot:12,carb:0,fat:10},{name:'Chocolate amargo 70%+',portion:'2 cuadraditos (~10g)',kcal:55,prot:1,carb:5,fat:4}]},
-    { id:'co2', name:'Leche + chocolate amargo', desc:'',
-      items:[{name:'Leche descremada',portion:'250ml',kcal:85,prot:9,carb:12,fat:0},{name:'Chocolate amargo 70%+',portion:'2 cuadraditos (~10g)',kcal:55,prot:1,carb:5,fat:4}]},
-    { id:'co3', name:'Claras cocidas + chocolate amargo', desc:'',
+    { id:'mm2', name:'Claras cocidas + chocolate amargo', desc:'Proteína magra + dulce',
       items:[{name:'Claras de huevo cocidas',portion:'3 uds',kcal:51,prot:10,carb:0,fat:0},{name:'Chocolate amargo 70%+',portion:'2 cuadraditos (~10g)',kcal:55,prot:1,carb:5,fat:4}]},
-    { id:'co4', name:'Banana + leche + chocolate', desc:'',
-      items:[{name:'Banana',portion:'1 mediana (~120g)',kcal:107,prot:1,carb:27,fat:0},{name:'Leche descremada',portion:'200ml',kcal:68,prot:7,carb:10,fat:0},{name:'Chocolate amargo 70%+',portion:'2 cuadraditos (~10g)',kcal:55,prot:1,carb:5,fat:4}]},
-    { id:'co5', name:'Claras + frutos secos', desc:'',
-      items:[{name:'Claras de huevo cocidas',portion:'3 uds',kcal:51,prot:10,carb:0,fat:0},{name:'Frutos secos',portion:'30g',kcal:185,prot:5,carb:5,fat:16}]},
+    { id:'mm3', name:'Leche + chocolate amargo', desc:'Calcio + antojo controlado',
+      items:[{name:'Leche descremada',portion:'250ml',kcal:85,prot:9,carb:12,fat:0},{name:'Chocolate amargo 70%+',portion:'2 cuadraditos (~10g)',kcal:55,prot:1,carb:5,fat:4}]},
+    { id:'mm4', name:'Huevo duro + manzana', desc:'Proteína + fibra + saciedad',
+      items:[{name:'Huevo duro',portion:'1 ud',kcal:72,prot:6,carb:0,fat:5},{name:'Manzana',portion:'1 mediana (~150g)',kcal:78,prot:0,carb:21,fat:0}]},
+    { id:'mm5', name:'Claras + frutos secos', desc:'Proteína magra + grasas buenas',
+      items:[{name:'Claras de huevo cocidas',portion:'3 uds',kcal:51,prot:10,carb:0,fat:0},{name:'Frutos secos (almendras)',portion:'25g',kcal:145,prot:5,carb:4,fat:13}]},
+    { id:'mm6', name:'Yogur / queso untable + frutos secos', desc:'Calcio + proteína + grasas',
+      items:[{name:'Queso untable descremado',portion:'60g',kcal:104,prot:10,carb:4,fat:4},{name:'Frutos secos (nueces)',portion:'20g',kcal:130,prot:3,carb:3,fat:13}]},
+    { id:'mm7', name:'Huevos duros + frutos secos', desc:'Proteína completa + energía sostenida',
+      items:[{name:'Huevos duros',portion:'2 uds',kcal:144,prot:12,carb:0,fat:10},{name:'Frutos secos',portion:'20g',kcal:120,prot:3,carb:3,fat:11}]},
+    { id:'mm8', name:'Huevo duro + banana', desc:'Proteína + carbos de calidad',
+      items:[{name:'Huevo duro',portion:'1 ud',kcal:72,prot:6,carb:0,fat:5},{name:'Banana',portion:'1 mediana (~120g)',kcal:107,prot:1,carb:27,fat:0}]},
+    { id:'mm9', name:'Pasta de maní + manzana', desc:'Grasas buenas + fibra + dulce natural',
+      items:[{name:'Pasta de maní natural',portion:'20g',kcal:118,prot:5,carb:4,fat:10},{name:'Manzana',portion:'1 mediana (~150g)',kcal:78,prot:0,carb:21,fat:0}]},
+    { id:'mm10', name:'Leche + banana + chocolate', desc:'Colación completa y saciante',
+      items:[{name:'Leche descremada',portion:'200ml',kcal:68,prot:7,carb:10,fat:0},{name:'Banana',portion:'1 pequeña (~90g)',kcal:80,prot:1,carb:20,fat:0},{name:'Chocolate amargo 70%+',portion:'2 cuadraditos (~10g)',kcal:55,prot:1,carb:5,fat:4}]},
+    { id:'mm11', name:'Avena + frutos secos', desc:'Fibra + energía lenta + grasas buenas',
+      items:[{name:'Avena (en seco)',portion:'30g',kcal:111,prot:4,carb:19,fat:2},{name:'Frutos secos',portion:'20g',kcal:120,prot:3,carb:3,fat:11}]},
+    { id:'mm12', name:'Claras + palta', desc:'Proteína magra + grasas saludables',
+      items:[{name:'Claras de huevo cocidas',portion:'3 uds',kcal:51,prot:10,carb:0,fat:0},{name:'Palta',portion:'¼ (~50g)',kcal:80,prot:1,carb:3,fat:8}]},
   ]
 };
 
@@ -419,8 +433,9 @@ function getMealCategory(mealName) {
   if (n.includes('desayuno')) return 'desayuno';
   if (n.includes('almuerzo')) return 'almuerzo';
   if (n.includes('cena')) return 'cena';
+  if (n.includes('media mañana') || n.includes('media-mañana') || n.includes('mañana')) return 'mediamañana';
   if (n.includes('merienda') || n.includes('pre-entreno') || n.includes('colación tarde')) return 'merienda';
-  if (n.includes('colación') || n.includes('nocturna')) return 'colacion';
+  if (n.includes('colación') || n.includes('colacion')) return 'mediamañana';
   return null;
 }
 
@@ -437,7 +452,7 @@ const DEFAULT_DAYS = [
       items:[{name:'Banana',portion:'1 mediana (~120g)',kcal:107,prot:1,carb:27,fat:0},{name:'Frutos secos (almendras)',portion:'30g',kcal:174,prot:6,carb:5,fat:15},{name:'Café solo',portion:'1 taza',kcal:5,prot:0,carb:0,fat:0}]},
     { name:'Cena / Post-entreno', time:'20:30', icon:'🌙', color:'#EDE7F6', menuId:'c1', tip:'',
       items:[{name:'Pechuga de pollo (cruda)',portion:'220g (~165g cocida)',kcal:255,prot:48,carb:0,fat:5},{name:'Batata hervida',portion:'200g',kcal:172,prot:2,carb:40,fat:0},{name:'Zapallito al vapor',portion:'150g',kcal:25,prot:1,carb:4,fat:0}]},
-    { name:'Colación nocturna', time:'22:00', icon:'🌜', color:'#F5F5F5', menuId:'co1', tip:'',
+    { name:'Colación media mañana', time:'10:30', icon:'☕', color:'#FFF8E1', menuId:'mm1', tip:'',
       items:[{name:'Huevos duros',portion:'2 uds',kcal:144,prot:12,carb:0,fat:10},{name:'Chocolate amargo 70%+',portion:'2 cuadraditos (~10g)',kcal:55,prot:1,carb:5,fat:4}]},
   ]},
   { label:'Martes', tag:'Gimnasio', meals:[
@@ -449,7 +464,7 @@ const DEFAULT_DAYS = [
       items:[{name:'Manzana',portion:'1 mediana (~150g)',kcal:78,prot:0,carb:21,fat:0},{name:'Tostadas con queso untable descremado',portion:'2 tostadas + 30g queso',kcal:170,prot:9,carb:22,fat:4},{name:'Café',portion:'1 taza',kcal:5,prot:0,carb:0,fat:0}]},
     { name:'Cena / Post-entreno', time:'20:30', icon:'🌙', color:'#EDE7F6', menuId:'c4', tip:'',
       items:[{name:'Pechuga de pollo (cruda)',portion:'250g (~190g cocida)',kcal:290,prot:54,carb:0,fat:6},{name:'Papa hervida',portion:'150g',kcal:116,prot:2,carb:26,fat:0},{name:'Repollo rehogado con ajo',portion:'150g',kcal:45,prot:2,carb:8,fat:1}]},
-    { name:'Colación nocturna', time:'22:00', icon:'🌜', color:'#F5F5F5', menuId:'co2', tip:'',
+    { name:'Colación media mañana', time:'10:30', icon:'☕', color:'#FFF8E1', menuId:'mm3', tip:'',
       items:[{name:'Leche descremada',portion:'250ml',kcal:85,prot:9,carb:12,fat:0},{name:'Chocolate amargo 70%+',portion:'2 cuadraditos (~10g)',kcal:55,prot:1,carb:5,fat:4}]},
   ]},
   { label:'Miércoles', tag:'Gimnasio', meals:[
@@ -461,7 +476,7 @@ const DEFAULT_DAYS = [
       items:[{name:'Banana',portion:'1 mediana (~120g)',kcal:107,prot:1,carb:27,fat:0},{name:'Huevo duro',portion:'1 ud',kcal:72,prot:6,carb:0,fat:5},{name:'Café',portion:'1 taza',kcal:5,prot:0,carb:0,fat:0}]},
     { name:'Cena / Post-entreno', time:'20:30', icon:'🌙', color:'#EDE7F6', menuId:'c3', tip:'',
       items:[{name:'Atún al natural',portion:'180g',kcal:198,prot:44,carb:0,fat:2},{name:'Papa mediana hervida',portion:'150g',kcal:116,prot:2,carb:26,fat:0},{name:'Zanahoria',portion:'80g',kcal:33,prot:0,carb:7,fat:0},{name:'Zapallito',portion:'100g',kcal:17,prot:1,carb:3,fat:0},{name:'Lechuga',portion:'60g',kcal:8,prot:0,carb:1,fat:0}]},
-    { name:'Colación nocturna', time:'22:00', icon:'🌜', color:'#F5F5F5', menuId:'co3', tip:'',
+    { name:'Colación media mañana', time:'10:30', icon:'☕', color:'#FFF8E1', menuId:'mm5', tip:'',
       items:[{name:'Claras de huevo cocidas',portion:'3 uds',kcal:51,prot:10,carb:0,fat:0},{name:'Frutos secos (nueces)',portion:'30g',kcal:196,prot:5,carb:4,fat:19}]},
   ]},
   { label:'Jueves', tag:'Gimnasio', meals:[
@@ -473,7 +488,7 @@ const DEFAULT_DAYS = [
       items:[{name:'Manzana',portion:'1 mediana (~150g)',kcal:78,prot:0,carb:21,fat:0},{name:'Tostadas con queso',portion:'2 tostadas + 20g queso',kcal:180,prot:10,carb:22,fat:6},{name:'Café',portion:'1 taza',kcal:5,prot:0,carb:0,fat:0}]},
     { name:'Cena / Post-entreno', time:'20:30', icon:'🌙', color:'#EDE7F6', menuId:'c2', tip:'El puré de zapallo es muy saciante y bajo en calorías.',
       items:[{name:'Pechuga de pollo (cruda)',portion:'250g',kcal:290,prot:54,carb:0,fat:6},{name:'Puré de zapallo (sin manteca)',portion:'250g',kcal:50,prot:2,carb:12,fat:0},{name:'Lechuga y tomate',portion:'100g c/u',kcal:26,prot:0,carb:5,fat:0}]},
-    { name:'Colación nocturna', time:'22:00', icon:'🌜', color:'#F5F5F5', menuId:'co2', tip:'',
+    { name:'Colación media mañana', time:'10:30', icon:'☕', color:'#FFF8E1', menuId:'mm3', tip:'',
       items:[{name:'Leche descremada',portion:'250ml',kcal:85,prot:9,carb:12,fat:0},{name:'Chocolate amargo 70%+',portion:'2 cuadraditos (~10g)',kcal:55,prot:1,carb:5,fat:4}]},
   ]},
   { label:'Viernes', tag:'Cardio', meals:[
@@ -485,7 +500,7 @@ const DEFAULT_DAYS = [
       items:[{name:'Banana',portion:'1 mediana (~120g)',kcal:107,prot:1,carb:27,fat:0},{name:'Huevo duro',portion:'1 ud',kcal:72,prot:6,carb:0,fat:5},{name:'Café',portion:'1 taza',kcal:5,prot:0,carb:0,fat:0}]},
     { name:'Cena / Post-cardio', time:'19:30', icon:'🌙', color:'#EDE7F6', menuId:'c9', tip:'',
       items:[{name:'Pechuga a la plancha (cruda)',portion:'220g',kcal:255,prot:48,carb:0,fat:5},{name:'Batata al horno',portion:'180g',kcal:155,prot:2,carb:36,fat:0},{name:'Remolacha cocida',portion:'100g',kcal:44,prot:2,carb:10,fat:0},{name:'Lechuga',portion:'60g',kcal:8,prot:0,carb:1,fat:0}]},
-    { name:'Colación nocturna', time:'21:30', icon:'🌜', color:'#F5F5F5', menuId:'co3', tip:'',
+    { name:'Colación media mañana', time:'10:30', icon:'☕', color:'#FFF8E1', menuId:'mm2', tip:'',
       items:[{name:'Claras de huevo cocidas',portion:'3 uds',kcal:51,prot:10,carb:0,fat:0},{name:'Chocolate amargo 70%+',portion:'2 cuadraditos (~10g)',kcal:55,prot:1,carb:5,fat:4}]},
   ]},
   { label:'Sábado', tag:'Libre', meals:[
@@ -703,7 +718,7 @@ function renderBiblioteca() {
     {key:'cena', label:'🌙 Cenas', color:'var(--accent)'},
     {key:'desayuno', label:'☀️ Desayunos', color:'var(--gold)'},
     {key:'merienda', label:'⚡ Meriendas', color:'var(--accent2)'},
-    {key:'colacion', label:'🌜 Colaciones nocturnas', color:'var(--text2)'},
+    {key:'mediamañana', label:'☕ Colaciones media mañana', color:'var(--text2)'},
   ];
   document.getElementById('bibliotecaContainer').innerHTML = cats.map(cat=>`
     <div style="margin-bottom:2rem">
