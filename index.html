@@ -165,6 +165,31 @@
   .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--text);color:#fff;padding:9px 18px;border-radius:20px;font-size:13px;font-weight:500;opacity:0;transition:opacity .3s;pointer-events:none;z-index:9999;white-space:nowrap}
   .toast.show{opacity:1}
 
+  /* LISTA SUPERMERCADO */
+  .super-section{margin-bottom:2rem}
+  .super-section-title{font-family:var(--font-d);font-size:15px;font-weight:700;color:var(--text);margin-bottom:.75rem;padding:.5rem .75rem;background:var(--surface2);border-radius:var(--rs);border-left:3px solid var(--accent);display:flex;align-items:center;gap:8px}
+  .super-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:8px}
+  .super-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--rs);padding:10px 14px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:all .12s;user-select:none}
+  .super-item:hover{border-color:var(--accent);background:var(--accent-light)}
+  .super-item.checked{background:var(--surface2);border-color:var(--border);opacity:.55}
+  .super-check{width:18px;height:18px;border:2px solid var(--border);border-radius:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;transition:all .12s}
+  .super-item.checked .super-check{background:var(--accent);border-color:var(--accent);color:#fff}
+  .super-item-name{font-size:13px;font-weight:500;color:var(--text);flex:1}
+  .super-item.checked .super-item-name{text-decoration:line-through;color:var(--text3)}
+  .super-item-qty{font-size:12px;color:var(--accent);font-weight:600;background:var(--accent-light);padding:1px 8px;border-radius:10px;white-space:nowrap}
+  .super-item.checked .super-item-qty{background:var(--surface2);color:var(--text3)}
+  .super-actions{display:flex;gap:8px;margin-bottom:1.5rem;flex-wrap:wrap;align-items:center}
+  .btn-super{background:var(--surface);border:1px solid var(--border);color:var(--text2);padding:7px 14px;border-radius:var(--rs);font-size:13px;cursor:pointer;font-family:var(--font-b);transition:all .12s}
+  .btn-super:hover{border-color:var(--accent);color:var(--accent)}
+  .super-progress{font-size:13px;color:var(--text2);margin-left:auto}
+  /* EXPORT DROPDOWN */
+  .export-wrap{position:relative}
+  .export-dropdown{display:none;position:absolute;top:calc(100% + 6px);right:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--rs);box-shadow:0 8px 24px rgba(0,0,0,.12);min-width:220px;z-index:200;overflow:hidden}
+  .export-dropdown.open{display:block}
+  .export-option{padding:11px 16px;font-size:13px;cursor:pointer;color:var(--text);display:flex;align-items:center;gap:8px;transition:background .1s;border-bottom:1px solid var(--border)}
+  .export-option:last-child{border-bottom:none}
+  .export-option:hover{background:var(--accent-light);color:var(--accent)}
+  .export-option .eo-icon{font-size:15px;width:20px;text-align:center}
   @media (max-width:600px){
     header,.main-tabs{padding:0 1rem}
     .hero{padding:1.25rem 1rem 1rem}
@@ -173,11 +198,13 @@
   }
   @media print{
     header{position:static} .main-tabs{display:none}
-    .tab-view{display:block!important}
-    .btn-export,.btn-reset,.menu-panel,.modal-overlay{display:none!important}
+    .export-wrap,.btn-reset,.menu-panel,.modal-overlay,.super-actions,.btn-menu,.btn-edit{display:none!important}
     body{background:#fff}
+    .tab-view.print-target{display:block!important}
+    .tab-view:not(.print-target){display:none!important}
     .day-view{display:block!important;page-break-before:always}
     .day-view:first-of-type{page-break-before:avoid}
+    .resumen-day{page-break-inside:avoid}
   }
 </style>
 </head>
@@ -187,7 +214,15 @@
   <div class="logo">nutriplan <span>/ Santiago López</span></div>
   <div class="hdr-actions">
     <button class="btn-reset" onclick="resetAll()">↺ Restaurar</button>
-    <button class="btn-export" onclick="window.print()">⬇ Exportar PDF</button>
+    <div class="export-wrap" id="exportWrap">
+      <button class="btn-export" onclick="toggleExportMenu(event)">⬇ Exportar PDF ▾</button>
+      <div class="export-dropdown" id="exportDropdown">
+        <div class="export-option" onclick="printTab('plan')"><span class="eo-icon">📅</span>Plan semanal completo</div>
+        <div class="export-option" onclick="printTab('resumen')"><span class="eo-icon">⚡</span>Resumen Almuerzo &amp; Cena</div>
+        <div class="export-option" onclick="printTab('biblioteca')"><span class="eo-icon">📖</span>Biblioteca de menús</div>
+        <div class="export-option" onclick="printTab('super')"><span class="eo-icon">🛒</span>Lista de supermercado</div>
+      </div>
+    </div>
   </div>
 </header>
 
@@ -195,6 +230,7 @@
   <button class="main-tab active" onclick="switchTab('plan',this)">📅 Plan semanal</button>
   <button class="main-tab" onclick="switchTab('resumen',this)">⚡ Resumen Almuerzo &amp; Cena</button>
   <button class="main-tab" onclick="switchTab('biblioteca',this)">📖 Biblioteca de menús</button>
+  <button class="main-tab" onclick="switchTab('super',this)">🛒 Lista de supermercado</button>
 </nav>
 
 <!-- TAB: PLAN SEMANAL -->
@@ -241,6 +277,20 @@
     <h2 style="font-family:var(--font-d);font-size:22px;font-weight:700;margin-bottom:4px;letter-spacing:-.3px">Biblioteca de menús</h2>
     <p style="font-size:13px;color:var(--text2);margin-bottom:1.5rem">Todos los platos disponibles para intercambiar. Hacé clic en cualquier menú para ver su detalle.</p>
     <div id="bibliotecaContainer"></div>
+  </div>
+</div>
+
+<!-- TAB: SUPERMERCADO -->
+<div class="tab-view" id="tab-super">
+  <div class="page-wrap">
+    <h2 style="font-family:var(--font-d);font-size:22px;font-weight:700;margin-bottom:4px;letter-spacing:-.3px">🛒 Lista de supermercado</h2>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:1.25rem">Generada automáticamente en base al plan semanal actual. Tocá cada ítem para tacharlo.</p>
+    <div class="super-actions">
+      <button class="btn-super" onclick="regenerarSuper()">↺ Regenerar lista</button>
+      <button class="btn-super" onclick="desmarcarTodo()">☐ Desmarcar todo</button>
+      <span class="super-progress" id="superProgress"></span>
+    </div>
+    <div id="superContainer"></div>
   </div>
 </div>
 
@@ -489,6 +539,7 @@ function switchTab(id, btn) {
   btn.classList.add('active');
   if (id==='resumen') renderResumen();
   if (id==='biblioteca') renderBiblioteca();
+  if (id==='super') renderSuper();
 }
 
 // ════════════════════════════════════════════════════════════
@@ -861,6 +912,231 @@ function showToast(msg) {
   const t=document.getElementById('toast');
   t.textContent=msg; t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+// ════════════════════════════════════════════════════════════
+// EXPORT POR PESTAÑA
+// ════════════════════════════════════════════════════════════
+function toggleExportMenu(e) {
+  e.stopPropagation();
+  document.getElementById('exportDropdown').classList.toggle('open');
+}
+document.addEventListener('click', function(e) {
+  const wrap = document.getElementById('exportWrap');
+  if (wrap && !wrap.contains(e.target)) {
+    document.getElementById('exportDropdown').classList.remove('open');
+  }
+});
+
+function printTab(tabId) {
+  document.getElementById('exportDropdown').classList.remove('open');
+  // Marcar qué tab imprimir
+  document.querySelectorAll('.tab-view').forEach(t => t.classList.remove('print-target'));
+  const target = document.getElementById('tab-' + tabId);
+  if (!target) return;
+  // Si el tab no está activo, primero renderizarlo
+  if (tabId === 'resumen') renderResumen();
+  if (tabId === 'biblioteca') renderBiblioteca();
+  if (tabId === 'super') renderSuper();
+  // Mostrar todos los días si es plan
+  if (tabId === 'plan') {
+    document.querySelectorAll('.day-view').forEach(d => d.classList.add('active'));
+  }
+  target.classList.add('print-target');
+  setTimeout(() => {
+    window.print();
+    // Restaurar estado después de imprimir
+    setTimeout(() => {
+      target.classList.remove('print-target');
+      if (tabId === 'plan') {
+        document.querySelectorAll('.day-view').forEach((d,i) => d.classList.toggle('active', i === activeDay));
+      }
+    }, 500);
+  }, 100);
+}
+
+// ════════════════════════════════════════════════════════════
+// LISTA DE SUPERMERCADO
+// ════════════════════════════════════════════════════════════
+const SUPER_KEY = 'nutriplan_super_checked';
+// Cantidades fijas por categoría (estimado semanal)
+const UNIDADES = {
+  // item name → {qty, unit, cat}
+};
+
+// Categorías del super
+const SUPER_CATS = {
+  'Proteínas': ['pechuga','pollo','atún','costeleta','huevo','clara','yema'],
+  'Lácteos': ['leche','queso'],
+  'Legumbres': ['lenteja','arveja','garbanzo'],
+  'Cereales y harinas': ['arroz','fideo','pasta','tostada','pan','avena'],
+  'Tubérculos': ['papa','batata','zapallo'],
+  'Verduras frescas': ['lechuga','tomate','zanahoria','repollo','zapallito','cebolla','ají','pimiento','brócoli','remolacha'],
+  'Frutas': ['banana','manzana','palta'],
+  'Grasas y extras': ['aceite','palta','frutos secos','almendra','nuez','chocolate','pasta de maní','maní'],
+  'Condimentos': ['salsa de tomate','café'],
+};
+
+function normalizeItemName(name) {
+  return name.toLowerCase()
+    .replace(/\(.*?\)/g,'')
+    .replace(/cruda|cocida|hervida|al vapor|al horno|descremada|natural|entero|en seco/gi,'')
+    .trim();
+}
+
+function getCat(name) {
+  const n = normalizeItemName(name);
+  for (const [cat, keys] of Object.entries(SUPER_CATS)) {
+    if (keys.some(k => n.includes(k))) return cat;
+  }
+  return 'Otros';
+}
+
+function buildShoppingList() {
+  // Recopilar todos los ítems del plan actual
+  const totals = {}; // key: nombre normalizado → {displayName, qty, unit, cat}
+  
+  planData.forEach(day => {
+    day.meals.forEach(meal => {
+      meal.items.forEach(item => {
+        const norm = normalizeItemName(item.name);
+        // Parsear cantidad
+        const portionStr = item.portion || '';
+        let qty = 0, unit = '';
+        
+        // Intentar extraer número y unidad
+        const mG = portionStr.match(/(\d+(?:[.,]\d+)?)\s*g/i);
+        const mMl = portionStr.match(/(\d+(?:[.,]\d+)?)\s*ml/i);
+        const mUd = portionStr.match(/(\d+(?:[.,]\d+)?)\s*u(?:d|nidad|s)?/i);
+        const mCda = portionStr.match(/(\d+(?:[.,]\d+)?)\s*cda/i);
+        const mTaza = portionStr.match(/(\d+(?:[.,]\d+)?)\s*taza/i);
+        
+        if (mG) { qty = parseFloat(mG[1]); unit = 'g'; }
+        else if (mMl) { qty = parseFloat(mMl[1]); unit = 'ml'; }
+        else if (mUd) { qty = parseFloat(mUd[1]); unit = 'uds'; }
+        else if (mCda) { qty = parseFloat(mCda[1]); unit = 'cdas'; }
+        else if (mTaza) { qty = parseFloat(mTaza[1]); unit = 'tazas'; }
+        else { qty = 1; unit = 'porción'; }
+        
+        if (!totals[norm]) {
+          totals[norm] = {
+            displayName: item.name.split('(')[0].trim().replace(/\s+/g,' '),
+            qty: 0, unit, cat: getCat(item.name)
+          };
+        }
+        // Solo sumar si misma unidad
+        if (totals[norm].unit === unit) totals[norm].qty += qty;
+        else totals[norm].qty += qty; // sumar igual
+      });
+    });
+  });
+  
+  // Formatear cantidades
+  const list = Object.values(totals).map(it => {
+    let qtyStr = '';
+    if (it.unit === 'g') {
+      if (it.qty >= 1000) qtyStr = (it.qty/1000).toFixed(1).replace('.0','') + ' kg';
+      else qtyStr = Math.ceil(it.qty) + ' g';
+    } else if (it.unit === 'ml') {
+      if (it.qty >= 1000) qtyStr = (it.qty/1000).toFixed(1).replace('.0','') + ' L';
+      else qtyStr = Math.ceil(it.qty) + ' ml';
+    } else if (it.unit === 'uds') {
+      qtyStr = Math.ceil(it.qty) + ' uds';
+    } else {
+      qtyStr = Math.ceil(it.qty) + ' ' + it.unit;
+    }
+    return { name: it.displayName, qty: qtyStr, cat: it.cat };
+  });
+  
+  // Agrupar por categoría
+  const grouped = {};
+  list.forEach(it => {
+    if (!grouped[it.cat]) grouped[it.cat] = [];
+    grouped[it.cat].push(it);
+  });
+  
+  // Ordenar categorías
+  const catOrder = Object.keys(SUPER_CATS).concat(['Otros']);
+  const sorted = {};
+  catOrder.forEach(cat => { if (grouped[cat]) sorted[cat] = grouped[cat]; });
+  Object.keys(grouped).forEach(cat => { if (!sorted[cat]) sorted[cat] = grouped[cat]; });
+  
+  return sorted;
+}
+
+let superList = {};
+let checkedItems = {};
+
+function loadChecked() {
+  try { checkedItems = JSON.parse(localStorage.getItem(SUPER_KEY)||'{}'); } catch(e){ checkedItems={}; }
+}
+function saveChecked() {
+  try { localStorage.setItem(SUPER_KEY, JSON.stringify(checkedItems)); } catch(e){} 
+}
+
+function renderSuper() {
+  loadChecked();
+  superList = buildShoppingList();
+  const container = document.getElementById('superContainer');
+  if (!container) return;
+  
+  const catIcons = {
+    'Proteínas':'🥩','Lácteos':'🥛','Legumbres':'🫘','Cereales y harinas':'🌾',
+    'Tubérculos':'🥔','Verduras frescas':'🥬','Frutas':'🍎',
+    'Grasas y extras':'🥑','Condimentos':'🧂','Otros':'📦'
+  };
+  
+  container.innerHTML = Object.entries(superList).map(([cat, items]) => `
+    <div class="super-section">
+      <div class="super-section-title">${catIcons[cat]||'📦'} ${cat}</div>
+      <div class="super-grid">
+        ${items.map(it => {
+          const key = it.name.toLowerCase();
+          const done = !!checkedItems[key];
+          return `<div class="super-item ${done?'checked':''}" onclick="toggleSuper(this,'${key.replace(/'/g,"\'")}')">
+            <div class="super-check">${done?'✓':''}</div>
+            <span class="super-item-name">${it.name}</span>
+            <span class="super-item-qty">${it.qty}</span>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`).join('');
+  
+  updateSuperProgress();
+}
+
+function toggleSuper(el, key) {
+  const done = el.classList.toggle('checked');
+  const check = el.querySelector('.super-check');
+  check.textContent = done ? '✓' : '';
+  if (done) checkedItems[key] = true;
+  else delete checkedItems[key];
+  saveChecked();
+  updateSuperProgress();
+}
+
+function updateSuperProgress() {
+  const total = document.querySelectorAll('.super-item').length;
+  const done = document.querySelectorAll('.super-item.checked').length;
+  const prog = document.getElementById('superProgress');
+  if (prog) prog.textContent = done > 0 ? `${done} de ${total} comprados` : `${total} productos en total`;
+}
+
+function desmarcarTodo() {
+  checkedItems = {};
+  saveChecked();
+  document.querySelectorAll('.super-item').forEach(el => {
+    el.classList.remove('checked');
+    el.querySelector('.super-check').textContent = '';
+  });
+  updateSuperProgress();
+}
+
+function regenerarSuper() {
+  checkedItems = {};
+  saveChecked();
+  renderSuper();
+  showToast('✓ Lista regenerada desde el plan actual');
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
