@@ -110,6 +110,13 @@
   .menu-option:hover{background:var(--accent-light)}
   .menu-option.current{background:var(--accent-light);box-shadow:inset 3px 0 0 var(--accent)}
   .mo-name{font-size:13px;font-weight:600}
+  .mo-group{padding:7px 14px;font-size:12px;font-weight:600;color:var(--text2);background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0}
+  .own-tag{font-size:10px;background:var(--blue-light);color:var(--blue);padding:1px 7px;border-radius:10px;font-weight:600;margin-left:6px;vertical-align:1px}
+  .from-cat{color:var(--text3);font-size:11px}
+  .lib-item.own{border-color:#b9cde6}
+  .lib-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px;flex-wrap:wrap}
+  .lib-used{font-size:11px;color:var(--text3)}
+  .lib-actions{display:flex;gap:6px}
   .mo-desc{font-size:12px;color:var(--text2);line-height:1.4}
   .mo-mac{font-size:11px;color:var(--text3);white-space:nowrap;text-align:right}
 
@@ -259,7 +266,7 @@
 <div class="tab-view" id="tab-biblioteca">
   <div class="page-wrap">
     <h2 class="page-title">Biblioteca de menús</h2>
-    <p class="page-lead">Todos los platos disponibles para intercambiar desde “Cambiar menú”. Los de cada grupo tienen calorías y proteína similares.</p>
+    <p class="page-lead">Todos los platos para elegir desde “Cambiar menú”. Los almuerzos y las cenas se pueden usar en cualquiera de las dos comidas, y lo mismo desayunos, media mañana y meriendas. Los platos que guardaste vos aparecen primero, marcados como “tuyo”.</p>
     <div id="bibliotecaContainer"></div>
   </div>
 </div>
@@ -287,7 +294,7 @@
     </div>
     <div class="modal-footer">
       <button class="btn btn-danger" data-action="revert-meal" id="revertBtn">Volver al menú original</button>
-      <div><button class="btn" data-action="close-edit">Cancelar</button><button class="btn btn-primary" data-action="save-edit">Guardar</button></div>
+      <div><button class="btn" data-action="close-edit">Cancelar</button><button class="btn" data-action="update-menu" id="updateMenuBtn" hidden></button><button class="btn" data-action="save-as-new">Guardar como plato nuevo</button><button class="btn btn-primary" data-action="save-edit">Guardar en este día</button></div>
     </div>
   </div>
 </div>
@@ -305,6 +312,17 @@
       <p class="form-hint" id="targetHint"></p>
     </div>
     <div class="modal-footer"><div><button class="btn" data-action="close-target">Cancelar</button><button class="btn btn-primary" data-action="save-target">Guardar objetivo</button></div></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="nameOverlay" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="nameTitle" style="max-width:420px">
+    <div class="modal-hdr"><div class="modal-title" id="nameTitle">Guardar como plato nuevo</div><button class="icon-btn" data-action="close-name" aria-label="Cerrar">✕</button></div>
+    <div class="modal-body">
+      <label class="form-grid" style="grid-template-columns:1fr"><span style="font-size:12px;color:var(--text2)">Nombre del plato</span><input class="fi" id="nameInput" maxlength="80"></label>
+      <p class="form-hint" id="nameHint"></p>
+    </div>
+    <div class="modal-footer"><div><button class="btn" data-action="close-name">Cancelar</button><button class="btn btn-primary" data-action="save-name">Guardar</button></div></div>
   </div>
 </div>
 
@@ -429,8 +447,19 @@ const DEFAULT_WEEK = [
 // ════════════════════════════════════════════════════════════
 const STORAGE_KEY = 'nutriplan_v3';
 const DEFAULT_TARGET = {kcal:2400, prot:180, carb:260, fat:72};
-const MENU_BY_ID = {};
-Object.entries(LIB).forEach(([cat, list]) => list.forEach(m => { MENU_BY_ID[m.id] = {...m, cat}; }));
+// Almuerzo y cena comparten platos; desayuno, media mañana y merienda también entre sí
+const GROUP = {desayuno:'light', mm:'light', merienda:'light', almuerzo:'main', cena:'main'};
+const CAT_LABEL = {desayuno:'Desayunos', mm:'Media mañana', almuerzo:'Almuerzos', merienda:'Meriendas', cena:'Cenas'};
+const CAT_SINGULAR = {desayuno:'desayuno', mm:'media mañana', almuerzo:'almuerzo', merienda:'merienda', cena:'cena'};
+const BASE_MENUS = {};
+Object.entries(LIB).forEach(([cat, list]) => list.forEach(m => { BASE_MENUS[m.id] = {...m, cat}; }));
+let MENU_BY_ID = {...BASE_MENUS};
+function rebuildMenus() {
+  MENU_BY_ID = {...BASE_MENUS};
+  (state && state.custom || []).forEach(m => { MENU_BY_ID[m.id] = {...m, custom:true}; });
+}
+const menusOfCat = cat => [...state.custom.filter(m => m.cat === cat), ...LIB[cat]].map(m => MENU_BY_ID[m.id]);
+const sameGroup = (menuId, mi) => MENU_BY_ID[menuId] && GROUP[MENU_BY_ID[menuId].cat] === GROUP[MEALS[mi].key];
 const DAY_NAMES = DEFAULT_WEEK.map(d => d[0]);
 
 let state, activeDay = 0, activeTab = 'plan', editing = null;
@@ -438,21 +467,25 @@ let state, activeDay = 0, activeTab = 'plan', editing = null;
 function defaultDays() {
   return DEFAULT_WEEK.map(([name, ids]) => ({name, slots: ids.map(id => ({menuId:id, items:null}))}));
 }
-function defaultState() { return {v:3, target:{...DEFAULT_TARGET}, days:defaultDays(), checked:{}}; }
+function defaultState() { return {v:3, target:{...DEFAULT_TARGET}, days:defaultDays(), checked:{}, custom:[]}; }
 function validItems(items) { return Array.isArray(items) && items.length > 0 && items.every(it => Array.isArray(it) && ING[it[0]] && Number(it[1]) > 0); }
 function validState(s) {
   return s && s.v === 3 && s.target && Number(s.target.kcal) > 0 &&
     Array.isArray(s.days) && s.days.length === 7 &&
     s.days.every(d => Array.isArray(d.slots) && d.slots.length === MEALS.length &&
-      d.slots.every((sl, mi) => MENU_BY_ID[sl.menuId] && MENU_BY_ID[sl.menuId].cat === MEALS[mi].key &&
+      d.slots.every((sl, mi) => sameGroup(sl.menuId, mi) &&
         (sl.items === null || validItems(sl.items))));
 }
 function loadState() {
   try {
     const s = JSON.parse(localStorage.getItem(STORAGE_KEY));
-    state = validState(s) ? s : defaultState();
+    if (s && !Array.isArray(s.custom)) s.custom = [];
+    const customOk = s && s.custom.every(m => m && /^u/.test(m.id) && typeof m.name === 'string' && LIB[m.cat] && validItems(m.items));
+    state = customOk ? s : null;
+    rebuildMenus();
+    if (!validState(state)) { state = defaultState(); rebuildMenus(); }
     if (!state.checked || typeof state.checked !== 'object') state.checked = {};
-  } catch (e) { state = defaultState(); }
+  } catch (e) { state = defaultState(); rebuildMenus(); }
 }
 function saveState() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {} }
 
@@ -535,19 +568,20 @@ function renderDays() {
 
 function mealCard(di, mi, sl) {
   const meal = MEALS[mi], menu = MENU_BY_ID[sl.menuId], items = slotItems(sl);
-  const options = LIB[meal.key].map(opt => {
+  const cats = MEALS.map(m => m.key).filter(k => GROUP[k] === GROUP[meal.key]).sort((x, y) => (y === meal.key) - (x === meal.key));
+  const options = cats.map(cat => `<div class="mo-group">${CAT_LABEL[cat]}</div>` + menusOfCat(cat).map(opt => {
     const om = macros(opt.items);
     return `<button class="menu-option${opt.id === sl.menuId ? ' current' : ''}" data-action="apply-menu" data-d="${di}" data-m="${mi}" data-id="${opt.id}">
-      <span><span class="mo-name">${esc(opt.name)}</span><br><span class="mo-desc">${opt.items.map(([id]) => esc(ING[id].n.replace(/\s*\(.*\)/, ''))).join(', ')}</span></span>
+      <span><span class="mo-name">${esc(opt.name)}</span>${opt.custom ? '<span class="own-tag">tuyo</span>' : ''}<br><span class="mo-desc">${opt.items.map(([id]) => esc(ING[id].n.replace(/\s*\(.*\)/, ''))).join(', ')}</span></span>
       <span class="mo-mac">🔥 ${fmt(om.kcal)}<br>💪 ${fmt(om.prot)} g</span></button>`;
-  }).join('');
+  }).join('')).join('');
   return `<article class="meal-card">
     <div class="meal-hdr">
       <div class="meal-hdr-l">
         <div class="meal-icon" aria-hidden="true">${meal.icon}</div>
         <div>
           <div class="meal-title">${meal.name} <span class="meal-sub">${meal.time}</span>${sl.items ? '<span class="edited-badge">editado</span>' : ''}</div>
-          <div class="meal-sub">${esc(menu.name)}</div>
+          <div class="meal-sub">${esc(menu.name)}${menu.custom ? '<span class="own-tag">tuyo</span>' : ''}${menu.cat !== meal.key ? ` <span class="from-cat">(de ${CAT_SINGULAR[menu.cat]})</span>` : ''}</div>
         </div>
       </div>
       <div class="meal-hdr-r">
@@ -613,12 +647,16 @@ function renderBiblioteca() {
   document.getElementById('bibliotecaContainer').innerHTML = MEALS.map(meal => `
     <section class="lib-cat">
       <h3>${meal.icon} ${meal.name}</h3>
-      <div class="lib-grid">${LIB[meal.key].map(opt => `
-        <div class="lib-item">
-          <h4>${esc(opt.name)}</h4>
+      <div class="lib-grid">${menusOfCat(meal.key).map(opt => {
+        const used = state.days.filter(d => d.slots.some(sl => sl.menuId === opt.id)).map(d => d.name.slice(0, 3));
+        return `<div class="lib-item${opt.custom ? ' own' : ''}">
+          <h4>${esc(opt.name)}${opt.custom ? '<span class="own-tag">tuyo</span>' : ''}</h4>
           <p>${opt.items.map(([id, q]) => `${esc(ING[id].n)} ${portion(id, q)}`).join(', ')}</p>
           <div class="chips">${chips(macros(opt.items), true)}</div>
-        </div>`).join('')}</div>
+          <div class="lib-foot"><span class="lib-used">${used.length ? 'En el plan: ' + used.join(', ') : 'No está en el plan'}</span>
+          ${opt.custom ? `<span class="lib-actions"><button class="btn btn-sm" data-action="rename-menu" data-id="${opt.id}">Renombrar</button><button class="btn btn-sm btn-danger" data-action="delete-menu" data-id="${opt.id}">Borrar</button></span>` : ''}</div>
+        </div>`;
+      }).join('')}</div>
     </section>`).join('');
 }
 
@@ -691,7 +729,11 @@ function openEdit(di, mi) {
   const sl = state.days[di].slots[mi];
   editing = {di, mi, rows: slotItems(sl).map(([id, q]) => ({id, name:ING[id].n, q}))};
   document.getElementById('editTitle').textContent = `${state.days[di].name}: ${MEALS[mi].name}`;
+  const menu = MENU_BY_ID[sl.menuId];
   document.getElementById('revertBtn').hidden = !sl.items;
+  const upd = document.getElementById('updateMenuBtn');
+  upd.hidden = !menu.custom;
+  upd.textContent = `Actualizar “${menu.name}”`;
   renderEditRows();
   openOverlay('editOverlay');
 }
@@ -716,15 +758,65 @@ function updateRow(i) {
   const valid = editing.rows.filter(x => x.id && x.q > 0).map(x => [x.id, x.q]);
   document.getElementById('editTotal').innerHTML = `<div class="chips">${chips(macros(valid), true)}</div>`;
 }
-function saveEdit() {
+function editedItems() {
   const rows = editing.rows.filter(r => r.id || r.name.trim() || r.q);
-  if (!rows.length) return toast('Agregá al menos un alimento');
-  if (rows.some(r => !r.id || !(r.q > 0))) return toast('Revisá los alimentos marcados');
-  const items = rows.map(r => [r.id, r.q]);
+  if (!rows.length) { toast('Agregá al menos un alimento'); return null; }
+  if (rows.some(r => !r.id || !(r.q > 0))) { toast('Revisá los alimentos marcados'); return null; }
+  return rows.map(r => [r.id, r.q]);
+}
+function saveEdit() {
+  const items = editedItems(); if (!items) return;
   const sl = state.days[editing.di].slots[editing.mi];
   sl.items = JSON.stringify(items) === JSON.stringify(MENU_BY_ID[sl.menuId].items) ? null : items;
   saveState(); closeOverlay('editOverlay'); renderPlan();
-  toast('✓ Cambios guardados');
+  toast('✓ Cambios guardados en este día');
+}
+function updateCustomMenu() {
+  const items = editedItems(); if (!items) return;
+  const sl = state.days[editing.di].slots[editing.mi];
+  const m = state.custom.find(x => x.id === sl.menuId);
+  m.items = items; sl.items = null;
+  rebuildMenus(); saveState(); closeOverlay('editOverlay'); renderPlan();
+  toast(`✓ “${m.name}” actualizado en toda la semana`);
+}
+
+// ── Nombre de plato (nuevo o renombrar) ──
+let naming = null;
+function openName(mode, id, value, items) {
+  naming = {mode, id, items};
+  document.getElementById('nameTitle').textContent = mode === 'new' ? 'Guardar como plato nuevo' : 'Renombrar plato';
+  document.getElementById('nameHint').textContent = mode === 'new'
+    ? 'Queda en la biblioteca y lo podés elegir desde “Cambiar menú” en cualquier día.'
+    : 'El nombre cambia en todos los días donde está el plato.';
+  const inp = document.getElementById('nameInput'); inp.value = value;
+  openOverlay('nameOverlay'); inp.select();
+}
+function saveName() {
+  const name = document.getElementById('nameInput').value.trim().replace(/\s+/g, ' ');
+  if (!name) return toast('Poné un nombre para el plato');
+  if (Object.values(MENU_BY_ID).some(m => m.id !== naming.id && m.name.toLowerCase() === name.toLowerCase())) return toast('Ya hay un plato con ese nombre');
+  if (naming.mode === 'rename') {
+    state.custom.find(m => m.id === naming.id).name = name;
+  } else {
+    const sl = state.days[editing.di].slots[editing.mi], cur = MENU_BY_ID[sl.menuId];
+    const id = 'u' + Date.now().toString(36);
+    state.custom.push({id, name, cat:MEALS[editing.mi].key, from:cur.custom ? cur.from : cur.id, items:naming.items});
+    state.days[editing.di].slots[editing.mi] = {menuId:id, items:null};
+    closeOverlay('editOverlay');
+  }
+  rebuildMenus(); saveState(); closeOverlay('nameOverlay');
+  TAB_RENDER[activeTab]();
+  toast(naming.mode === 'new' ? `✓ “${name}” guardado` : '✓ Nombre actualizado');
+  naming = null;
+}
+function deleteMenu(id) {
+  const m = state.custom.find(x => x.id === id);
+  const fallback = BASE_MENUS[m.from] ? m.from : LIB[m.cat][0].id;
+  if (!confirm(`¿Borrar “${m.name}”? Los días que lo usan pasan a “${BASE_MENUS[fallback].name}”.`)) return;
+  state.days.forEach(d => d.slots.forEach(sl => { if (sl.menuId === id) { sl.menuId = fallback; sl.items = null; } }));
+  state.custom = state.custom.filter(x => x.id !== id);
+  rebuildMenus(); saveState(); TAB_RENDER[activeTab]();
+  toast('Plato borrado');
 }
 
 // ════════════════════════════════════════════════════════════
@@ -762,7 +854,7 @@ function switchTab(id) {
 }
 let lastFocus = null;
 function openOverlay(id) { lastFocus = document.activeElement; const o = document.getElementById(id); o.hidden = false; o.querySelector('input,button')?.focus(); }
-function closeOverlay(id) { document.getElementById(id).hidden = true; if (id === 'editOverlay') editing = null; lastFocus?.focus?.(); }
+function closeOverlay(id) { document.getElementById(id).hidden = true; if (id === 'editOverlay') editing = null; if (id !== 'nameOverlay' || document.getElementById('editOverlay').hidden) lastFocus?.focus?.(); }
 function setExport(open) { document.getElementById('exportDropdown').hidden = !open; document.getElementById('exportBtn').setAttribute('aria-expanded', open); }
 function printTab(id) {
   setExport(false);
@@ -802,6 +894,16 @@ document.addEventListener('click', e => {
     case 'remove-row':
       editing.rows.splice(Number(b.dataset.i), 1); return renderEditRows();
     case 'save-edit': return saveEdit();
+    case 'save-as-new': {
+      const items = editedItems(); if (!items) return;
+      const cur = MENU_BY_ID[state.days[editing.di].slots[editing.mi].menuId];
+      return openName('new', null, cur.custom ? cur.name + ' (2)' : cur.name + ' (variante)', items);
+    }
+    case 'update-menu': return updateCustomMenu();
+    case 'save-name': return saveName();
+    case 'close-name': return closeOverlay('nameOverlay');
+    case 'rename-menu': return openName('rename', b.dataset.id, MENU_BY_ID[b.dataset.id].name);
+    case 'delete-menu': return deleteMenu(b.dataset.id);
     case 'revert-meal':
       state.days[editing.di].slots[editing.mi].items = null;
       saveState(); closeOverlay('editOverlay'); renderPlan(); return toast('Menú original restaurado');
@@ -835,10 +937,12 @@ document.getElementById('editRows').addEventListener('input', e => {
   updateRow(i);
 });
 document.getElementById('targetOverlay').addEventListener('input', targetHint);
+document.getElementById('nameInput').addEventListener('keydown', e => { if (e.key === 'Enter') saveName(); });
 document.addEventListener('keydown', e => {
   if (e.key !== 'Escape') return;
   setExport(false);
-  ['editOverlay', 'targetOverlay'].forEach(id => { if (!document.getElementById(id).hidden) closeOverlay(id); });
+  const open = ['nameOverlay', 'editOverlay', 'targetOverlay'].find(id => !document.getElementById(id).hidden);
+  if (open) closeOverlay(open);
 });
 
 // ── INICIO ──
