@@ -239,7 +239,7 @@
   <div class="page-wrap">
     <div class="notas-grid">
       <div class="nota-card"><strong>Todos los días iguales</strong>Cada comida está calibrada a un rango fijo, así que cualquier combinación de menús da un total parecido.</div>
-      <div class="nota-card"><strong>Cómo pesar</strong>Carnes y pescados en crudo. Arroz, fideos y legumbres ya cocidos. Papa, batata y zapallo pelados.</div>
+      <div class="nota-card"><strong>Cómo pesar</strong>Carnes, pescados y milanesas en crudo. Arroz, fideos y legumbres ya cocidos. Papa, batata y zapallo pelados.</div>
       <div class="nota-card"><strong>Aceite incluido</strong>El aceite para cocinar y aliñar ya está contado en cada plato. Medilo con cuchara.</div>
       <div class="nota-card"><strong>Libres</strong>Café, mate, té, infusiones, edulcorante, especias, limón y vinagre no suman.</div>
     </div>
@@ -320,10 +320,13 @@ const ING = {
   merluza:{n:'Filet de merluza',k:75,p:17,c:0,f:0.8,cat:'Carnes y pescados',bl:'crudo'},
   caballa:{n:'Caballa al natural (escurrida)',k:170,p:22,c:0,f:9,cat:'Carnes y pescados',bl:'peso escurrido'},
   atun:{n:'Atún al natural (escurrido)',k:116,p:26,c:0,f:1,cat:'Carnes y pescados',bl:'peso escurrido'},
+  milacarne:{n:'Milanesa de carne (cruda, rebozada)',k:180,p:19.3,c:14.7,f:5.3,u:150,un:'milanesa',cat:'Carnes y pescados'},
+  milapollo:{n:'Milanesa de pollo (cruda, rebozada)',k:173,p:20,c:14.7,f:3.3,u:150,un:'milanesa',cat:'Carnes y pescados'},
   huevo:{n:'Huevo',k:143,p:12.6,c:0.7,f:9.5,u:50,un:'ud',cat:'Huevos y lácteos'},
   clara:{n:'Clara de huevo',k:52,p:10.9,c:0.7,f:0.2,u:33,un:'ud',cat:'Huevos y lácteos'},
   leche:{n:'Leche descremada',k:36,p:3.3,c:5,f:0.3,ml:true,cat:'Huevos y lácteos'},
   yogur:{n:'Yogur natural descremado',k:50,p:4.5,c:6.5,f:0.5,cat:'Huevos y lácteos'},
+  cremoso:{n:'Queso cremoso',k:300,p:20,c:1,f:24,cat:'Huevos y lácteos'},
   queso:{n:'Queso magro (tipo port salut light)',k:230,p:24,c:1,f:14,cat:'Huevos y lácteos'},
   avena:{n:'Avena',k:375,p:13,c:60,f:7,cat:'Almacén'},
   tostada:{n:'Pan integral / tostada',k:250,p:9,c:44,f:3.5,u:25,un:'rebanada',cat:'Almacén'},
@@ -366,18 +369,18 @@ const MEALS = [
 // items: [id, cantidad] — gramos (ml en leche) o unidades si el ingrediente tiene u
 const LIB = {
  desayuno:[
-  {id:'d1',name:'Revuelto con tostadas y café con leche',items:[['huevo',2],['clara',3],['tostada',3],['leche',200],['aceite',3]]},
-  {id:'d2',name:'Avena cocida con leche, claras y banana',items:[['avena',60],['leche',250],['clara',4],['banana',100],['mani',10]]},
-  {id:'d3',name:'Tostadas con palta y huevos',items:[['huevo',2],['clara',2],['palta',50],['tostada',3],['leche',200]]},
+  {id:'d1',name:'Revuelto con tostadas y café con leche',items:[['huevo',3],['tostada',3],['leche',200],['aceite',3]]},
+  {id:'d2',name:'Avena con leche y banana, con huevos',items:[['avena',50],['leche',250],['banana',100],['huevo',2]]},
+  {id:'d3',name:'Tostadas con palta y huevos',items:[['huevo',3],['palta',40],['tostada',2],['leche',200]]},
   {id:'d4',name:'Yogur con avena, manzana y huevos duros',items:[['yogur',300],['avena',40],['manzana',150],['huevo',2]]},
-  {id:'d5',name:'Tortilla con queso y tomate',items:[['huevo',2],['clara',2],['queso',30],['tostada',2],['tomate',100],['leche',150],['aceite',3]]},
+  {id:'d5',name:'Tortilla con queso y tomate',items:[['huevo',3],['queso',30],['tostada',2],['tomate',100],['leche',150],['aceite',3]]},
  ],
  mm:[
   {id:'mm1',name:'Yogur con almendras',items:[['yogur',300],['almendras',20]]},
-  {id:'mm2',name:'Huevos duros y manzana',items:[['huevo',2],['clara',1],['manzana',150]]},
+  {id:'mm2',name:'Huevos duros, manzana y yogur',items:[['huevo',2],['manzana',150],['yogur',100]]},
   {id:'mm3',name:'Leche, chocolate amargo y almendras',items:[['leche',300],['choco',10],['almendras',15]]},
   {id:'mm4',name:'Tostadas con queso y tomate',items:[['tostada',2],['queso',40],['tomate',60]]},
-  {id:'mm5',name:'Claras con palta y tostada',items:[['clara',4],['palta',50],['tostada',2],['aceite',2]]},
+  {id:'mm5',name:'Huevo con palta y tostada',items:[['huevo',1],['palta',40],['tostada',2]]},
  ],
  almuerzo:[
   {id:'a1',name:'Pollo con arroz y ensalada',items:[['pollo',220],['arroz',250],['lechuga',60],['tomate',100],['zanahoria',80],['aceite',8]]},
@@ -387,6 +390,8 @@ const LIB = {
   {id:'a5',name:'Costeleta con batata y brócoli',items:[['cerdo',200],['batata',350],['brocoli',150],['aceite',5]]},
   {id:'a6',name:'Merluza al horno con puré de papa',items:[['merluza',280],['papa',400],['leche',30],['lechuga',60],['tomate',100],['aceite',10]]},
   {id:'a7',name:'Wok de pollo con arroz yamaní',items:[['pollo',220],['yamani',250],['zapallito',150],['zanahoria',80],['morron',80],['aceite',10]]},
+  {id:'a9',name:'Milanesas al horno con papa y ensalada',items:[['milacarne',2],['papa',150],['lechuga',60],['tomate',100],['zanahoria',80]]},
+  {id:'a10',name:'Salteado de pollo con fideos',items:[['pollo',220],['fideos',200],['zanahoria',80],['cebolla',80],['repollo',100],['morron',80],['zapallito',150],['aceite',5]]},
   {id:'a8',name:'Ensalada de garbanzos con atún y huevo',items:[['garbanzos',150],['atun',120],['huevo',1],['tomate',100],['cebolla',50],['lechuga',50],['tostada',2],['aceite',10]]},
  ],
  merienda:[
@@ -394,25 +399,28 @@ const LIB = {
   {id:'me2',name:'Café con leche, tostadas, queso y huevo',items:[['leche',200],['tostada',2],['queso',30],['huevo',1],['tomate',50]]},
   {id:'me3',name:'Licuado de leche, banana, avena y maní',items:[['leche',300],['banana',120],['avena',20],['mani',15]]},
   {id:'me4',name:'Sándwich de atún y fruta',items:[['tostada',2],['atun',100],['tomate',50],['lechuga',30],['manzana',150]]},
-  {id:'me5',name:'Huevos duros, tostada y naranja',items:[['huevo',2],['clara',1],['tostada',2],['naranja',180]]},
+  {id:'me5',name:'Huevos duros, tostada y naranja',items:[['huevo',2],['tostada',2],['naranja',180]]},
  ],
  cena:[
   {id:'c1',name:'Pollo con puré mixto y brócoli',items:[['pollo',220],['zapallo',300],['papa',150],['brocoli',150],['aceite',5]]},
   {id:'c2',name:'Caballa con papa y ensalada',items:[['caballa',170],['huevo',1],['papa',250],['lechuga',60],['tomate',100],['zanahoria',80]]},
   {id:'c3',name:'Carne magra con batata y zapallitos',items:[['vaca',200],['batata',250],['zapallito',200],['cebolla',80],['aceite',7]]},
-  {id:'c4',name:'Omelette de espinaca y queso con pan',items:[['huevo',3],['clara',4],['queso',30],['espinaca',100],['tomate',100],['tostada',3],['aceite',5]]},
+  {id:'c4',name:'Omelette de espinaca y queso con pan',items:[['huevo',4],['queso',30],['espinaca',100],['tomate',100],['tostada',3]]},
   {id:'c5',name:'Merluza con arroz y verduras',items:[['merluza',280],['arroz',200],['zanahoria',80],['zapallito',150],['aceite',8]]},
-  {id:'c6',name:'Pollo al horno con papas y ensalada',items:[['pollo',220],['papa',250],['lechuga',60],['tomate',100],['aceite',10]]},
+  {id:'c6',name:'Pollo al horno con papas y ensalada',items:[['pollo',240],['papa',250],['lechuga',60],['tomate',100],['aceite',10]]},
+  {id:'c8',name:'Milanesas al horno con ensalada',items:[['milacarne',2],['lechuga',60],['tomate',100],['zanahoria',80],['remolacha',80]]},
+  {id:'c9',name:'Milanesas de pollo con huevo a la plancha',items:[['milapollo',2],['huevo',1],['lechuga',60],['tomate',100]]},
+  {id:'c10',name:'Salteado de pollo con fideos',items:[['pollo',200],['fideos',150],['zanahoria',80],['cebolla',80],['repollo',100],['morron',80],['zapallito',150],['aceite',5]]},
   {id:'c7',name:'Fideos integrales con pollo y verduras',items:[['pollo',200],['fideosint',200],['morron',80],['cebolla',80],['trit',100],['aceite',5]]},
  ],
 };
 const DEFAULT_WEEK = [
   ['Lunes',    ['d1','mm1','a1','me1','c3']],
-  ['Martes',   ['d2','mm2','a5','me2','c1']],
+  ['Martes',   ['d2','mm2','a5','me2','c8']],
   ['Miércoles',['d3','mm3','a2','me3','c5']],
   ['Jueves',   ['d4','mm5','a4','me2','c4']],
-  ['Viernes',  ['d5','mm1','a7','me4','c2']],
-  ['Sábado',   ['d1','mm4','a3','me5','c7']],
+  ['Viernes',  ['d5','mm1','a10','me4','c2']],
+  ['Sábado',   ['d1','mm4','a9','me5','c7']],
   ['Domingo',  ['d3','mm2','a6','me1','c6']],
 ];
 
@@ -420,7 +428,7 @@ const DEFAULT_WEEK = [
 // ESTADO
 // ════════════════════════════════════════════════════════════
 const STORAGE_KEY = 'nutriplan_v3';
-const DEFAULT_TARGET = {kcal:2400, prot:185, carb:260, fat:70};
+const DEFAULT_TARGET = {kcal:2400, prot:180, carb:260, fat:72};
 const MENU_BY_ID = {};
 Object.entries(LIB).forEach(([cat, list]) => list.forEach(m => { MENU_BY_ID[m.id] = {...m, cat}; }));
 const DAY_NAMES = DEFAULT_WEEK.map(d => d[0]);
